@@ -62,7 +62,7 @@ Application.use ((Request, Response, Next) =>
 	Next ();
 });
 
-Application.use (CORS ({origin: [process.env.Ordering_Application_URL, process.env.Website_URL, process.env.Dasboard_Application_URL]}));
+Application.use (CORS ({origin: process.env.Environment === "Production" ? [] : [process.env.Ordering_Application_URL, process.env.Website_URL, process.env.Dasboard_Application_URL]}));
 
 Application.use ('/api', Router);
 
