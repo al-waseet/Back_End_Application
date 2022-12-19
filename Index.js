@@ -1,6 +1,5 @@
 require ('dotenv').config ();
 
-const axios = require ('axios');
 const bcrypt = require ('bcrypt');
 const Body_Parser = require ('body-parser');
 const CORS = require ('cors');
@@ -8,13 +7,13 @@ const crypto = require ('crypto').webcrypto;
 const Express = require ('express');
 const JSON_Web_Token = require ('jsonwebtoken');
 const nodemailer = require ("nodemailer");
-const ObjectId = require ('mongodb').ObjectId; 
+const ObjectId = require ('mongodb').ObjectId;
 
-const Router = Express.Router ();
+const Helpers = require ('./Helpers');
 const Response_Handler = require ('./Middleware/Response_Handler');
 
+const Router = Express.Router ();
 const Application = Express ();
-
 Application.use (Express.static (__dirname));
 Application.use (Body_Parser.json ({limit: '50mb'}))
 Application.use (Express.json ());
@@ -68,7 +67,7 @@ Application.use ((Request, Response, Next) =>
 	Next ();
 });
 
-Application.use (CORS ({origin: process.env.Environment === "Production" ? [] : [process.env.Ordering_Application_URL, process.env.Website_URL, process.env.Dasboard_Application_URL]}));
+Application.use (CORS ({origin: process.env.Environment === "Production" ? [] : [process.env.Ordering_Application_Root_URL, process.env.Landing_Page_Root_URL, process.env.Dasboard_Root_URL]}));
 
 Application.use ('/api', Router);
 
@@ -126,6 +125,12 @@ Router.post ('/order', async (Request, Response, Next) =>
 
 Router.put ('/restaurant', async (Request, Response, Next) => 
 {
+	/*Restaurant.Data.Categories.forEach (Category => Category.Banner_Image = Configuration.COS_URL + Category.Banner_Image);
+	Restaurant.Data.Cart_Icon = Configuration.COS_URL + Restaurant.Data.Cart_Icon;
+	Object.keys (Restaurant.Data.Icons).forEach (Key => Restaurant.Data.Icons [Key] = Configuration.COS_URL + Restaurant.Data.Icons [Key]); 
+	Restaurant.Data.Menu.forEach (Menu_Item => Menu_Item.Image = Configuration.COS_URL + Menu_Item.Image); 
+	Restaurant.Data.Logo = Configuration.COS_URL + Restaurant.Data.Logo;*/
+
 	Update_Data ('Restaurants', Request.body, {_id: ObjectId (Request.body._id)}).then (Data => 
 	{
 		Response.Result = {Status: 200};
@@ -139,6 +144,8 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 
 Router.put ('/user', async (Request, Response, Next) => 
 {
+	//Authenticated_User.Data.Avatar = Configuration.COS_URL + Authenticated_User.Data.Avatar;
+
 	Update_Data ('Users', Request.body, {Username: Request.body.Username}).then (Data => 
 	{
 		Response.Result = {Status: 200};
@@ -251,31 +258,6 @@ Router.post ("/register", async (Request, Response, Next) =>
 	New_User.Token = JSON_Web_Token.sign ({ Username: New_User.Username }, process.env.JSON_Web_Token_Key, {expiresIn: "2h"});
 	New_User.Status = 201;
 	Response.status (201).json (New_User);
-}, Response_Handler);
-
-Router.post ('/mamo-payment', async (Request, Response, Next) => 
-{
-	const Mamo_Payment_Request_Response = await axios ('https://business.mamopay.com/manage_api/v1/links', 
-	{
-		method: 'POST',
-		headers: 
-		{
-			"Authorization": "Bearer " + process.env.Mamo_Token,
-			"Content-type": "application/json"
-		},
-		data: JSON.stringify ({
-			"name": Request.body.Subscription_Plan,
-			"description": Request.body.Description,
-			"capacity": 1,
-			"active": true,
-			"return_url": "https://alwaseet.me/success",
-			"amount": Request.body.Price,
-			"enable_message": true,
-			"enable_tips": false,
-			"enable_customer_details": true
-		})
-	});
-	Response.status (200).json (Object.assign ({Status: 200}, Mamo_Payment_Request_Response));
 }, Response_Handler);
 
 Router.post ('/email', async (Request, Response, Next) => 
