@@ -125,12 +125,60 @@ Router.post ('/order', async (Request, Response, Next) =>
 
 Router.put ('/restaurant', async (Request, Response, Next) => 
 {
-	/*Restaurant.Data.Categories.forEach (Category => Category.Banner_Image = Configuration.COS_URL + Category.Banner_Image);
-	Restaurant.Data.Cart_Icon = Configuration.COS_URL + Restaurant.Data.Cart_Icon;
-	Object.keys (Restaurant.Data.Icons).forEach (Key => Restaurant.Data.Icons [Key] = Configuration.COS_URL + Restaurant.Data.Icons [Key]); 
-	Restaurant.Data.Menu.forEach (Menu_Item => Menu_Item.Image = Configuration.COS_URL + Menu_Item.Image); 
-	Restaurant.Data.Logo = Configuration.COS_URL + Restaurant.Data.Logo;*/
-
+	Request.body.Categories.forEach (Category => 
+	{
+		if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Absolute URL')
+		{
+			Category.Banner_Image = Category.File_Path;
+		}
+		else if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Base64 Image')
+		{
+			Helpers.Save_Base64_Image_to_a_File (Category.Banner_Image, Category.File_Path);
+		}
+		delete Category.File_Path;
+	});
+	if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Absolute URL')
+	{
+		Request.body.Cart_Icon = Request.body.Cart_Icon_File_Path;
+	}
+	else if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Base64 Image')
+	{
+		Helpers.Save_Base64_Image_to_a_File (Request.body.Cart_Icon, Request.body.Cart_Icon_File_Path);
+	}
+	delete Request.body.Cart_Icon_File_Path;
+	Object.keys (Request.body.Icons).forEach (Key =>
+	{
+		if (Helpers.Validate_Image_URL (Request.body.Icons [Key]) === 'Absolute URL')
+		{
+			Request.body.Icons [Key] = Request.body.Icons [`${Key}_File_Path`];
+		}
+		else if (Helpers.Validate_Image_URL (Request.body.Icons [Key]) === 'Base64 Image')
+		{
+			Helpers.Save_Base64_Image_to_a_File (Request.body.Icons [Key], Request.body.Icons [`${Key}_File_Path`]);
+		}
+		delete Request.body.Icons [`${Key}_File_Path`];
+	});
+	Request.body.Menu.forEach (Menu_Item => 
+	{
+		if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Absolute URL')
+		{
+			Menu_Item.Image = Menu_Item.File_Path;
+		}
+		else if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Base64 Image')
+		{
+			Helpers.Save_Base64_Image_to_a_File (Menu_Item.Image, Menu_Item.File_Path);
+		}
+		delete Menu_Item.File_Path;
+	});
+	if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Absolute URL')
+	{
+		Request.body.Logo = Request.body.Logo_File_Path;
+	}
+	else if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Base64 Image')
+	{
+		Helpers.Save_Base64_Image_to_a_File (Request.body.Logo, Request.body.Logo_File_Path);
+	}
+	delete Request.body.Logo_File_Path;
 	Update_Data ('Restaurants', Request.body, {_id: ObjectId (Request.body._id)}).then (Data => 
 	{
 		Response.Result = {Status: 200};
@@ -144,8 +192,15 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 
 Router.put ('/user', async (Request, Response, Next) => 
 {
-	//Authenticated_User.Data.Avatar = Configuration.COS_URL + Authenticated_User.Data.Avatar;
-
+	if (Helpers.Validate_Image_URL (Restaurant.Data.Avatar) === 'Absolute URL')
+	{
+		Request.body.Avatar = Request.body.Avatar_File_Path;
+	}
+	else if (Helpers.Validate_Image_URL (Restaurant.Data.Avatar) === 'Base64 Image')
+	{
+		Helpers.Save_Base64_Image_to_a_File (Request.body.Avatar, Request.body.Avatar_File_Path);
+	}
+	delete Request.body.Avatar_File_Path;
 	Update_Data ('Users', Request.body, {Username: Request.body.Username}).then (Data => 
 	{
 		Response.Result = {Status: 200};
