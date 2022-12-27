@@ -224,12 +224,55 @@ Router.post ("/login", async (Request, Response, Next) =>
 		Response.Result = {Status: 401};
 		Next ();
 	}
-	Get_Data ('Users', {Username: Request.body.Username}, 'One').then (async (Authenticated_User) =>
+	await Database.collection ('Users').aggregate ([
+		{
+			$match: {Username: Request.body.Username}
+		},
+		{
+			$project:
+			{
+				"Restaurant_ID_Object": {$toObjectId: "$Restaurant_ID"} 
+			} 
+		},
+		{
+			$lookup:
+			{
+				from: "Restaurants",
+				localField: "Restaurant_ID_Object",
+				foreignField: "$_id",
+				as: "Restaurant"
+			}
+		},
+		/*{
+			$set: 
+			{
+				Restaurant: 
+				{
+					$arrayElemAt: ["$Restaurant", 0]
+				}
+			}
+		},*/
+		/*{
+			$unwind: "$Restaurant"
+		},*/
+		{
+			$lookup:
+			{
+				from: "Users",
+				localField: "Restaurant_ID",
+				foreignField: "Restaurant_ID",
+				as: "Users"
+			}
+		},
+		/*{
+			$unwind: "$Users"
+		}*/
+	]).next ().then (async Authenticated_User =>
 	{
+		console.log (Authenticated_User)
 		if (Authenticated_User && (await bcrypt.compare (Request.body.Password, Authenticated_User.Password)))
 		{
 			Authenticated_User.Token = JSON_Web_Token.sign ({ Username: Authenticated_User.Username }, process.env.JSON_Web_Token_Key, {expiresIn: "2h"});
-			Authenticated_User.Status = 200;
 			delete Authenticated_User.Password;
 			Response.Result = {Data: Authenticated_User, Status: 200};
 			Next ();
