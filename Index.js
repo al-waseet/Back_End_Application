@@ -229,7 +229,7 @@ Router.post ("/login", async (Request, Response, Next) =>
 			$match: {Username: Request.body.Username}
 		},
 		{
-			$project:
+			$addFields:
 			{
 				"Restaurant_ID_Object": {$toObjectId: "$Restaurant_ID"} 
 			} 
@@ -239,11 +239,11 @@ Router.post ("/login", async (Request, Response, Next) =>
 			{
 				from: "Restaurants",
 				localField: "Restaurant_ID_Object",
-				foreignField: "$_id",
+				foreignField: "_id",
 				as: "Restaurant"
 			}
 		},
-		/*{
+		{
 			$set: 
 			{
 				Restaurant: 
@@ -251,10 +251,7 @@ Router.post ("/login", async (Request, Response, Next) =>
 					$arrayElemAt: ["$Restaurant", 0]
 				}
 			}
-		},*/
-		/*{
-			$unwind: "$Restaurant"
-		},*/
+		},
 		{
 			$lookup:
 			{
@@ -263,17 +260,15 @@ Router.post ("/login", async (Request, Response, Next) =>
 				foreignField: "Restaurant_ID",
 				as: "Users"
 			}
-		},
-		/*{
-			$unwind: "$Users"
-		}*/
+		}
 	]).next ().then (async Authenticated_User =>
 	{
-		console.log (Authenticated_User)
 		if (Authenticated_User && (await bcrypt.compare (Request.body.Password, Authenticated_User.Password)))
 		{
 			Authenticated_User.Token = JSON_Web_Token.sign ({ Username: Authenticated_User.Username }, process.env.JSON_Web_Token_Key, {expiresIn: "2h"});
-			delete Authenticated_User.Password;
+			delete Authenticated_User.Restaurant_ID_Object;
+            delete Authenticated_User.Password;
+            Authenticated_User.Users.forEach (User => delete User.Password);
 			Response.Result = {Data: Authenticated_User, Status: 200};
 			Next ();
 		}
