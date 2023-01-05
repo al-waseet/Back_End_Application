@@ -32,6 +32,9 @@ const Validate_Image_URL = Image_URL =>
 	}
 }
 
-module.exports = Save_Base64_Image_to_a_File;
-module.exports = Turn_Absolute_URL_to_Abstract_URL;
-module.exports = Validate_Image_URL;
+module.exports = 
+{
+    Save_Base64_Image_to_a_File,
+    Turn_Absolute_URL_to_Abstract_URL,
+    Validate_Image_URL,
+}

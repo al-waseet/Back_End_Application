@@ -137,11 +137,11 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 		}
 		delete Category.File_Path;
 	});
-	if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Absolute URL')
+	if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Absolute URL')
 	{
 		Request.body.Cart_Icon = Request.body.Cart_Icon_File_Path;
 	}
-	else if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Base64 Image')
+	else if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Base64 Image')
 	{
 		Helpers.Save_Base64_Image_to_a_File (Request.body.Cart_Icon, Request.body.Cart_Icon_File_Path);
 	}
@@ -160,21 +160,21 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 	});
 	Request.body.Menu.forEach (Menu_Item => 
 	{
-		if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Absolute URL')
+		if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Absolute URL')
 		{
 			Menu_Item.Image = Menu_Item.File_Path;
 		}
-		else if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Base64 Image')
+		else if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Base64 Image')
 		{
 			Helpers.Save_Base64_Image_to_a_File (Menu_Item.Image, Menu_Item.File_Path);
 		}
 		delete Menu_Item.File_Path;
 	});
-	if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Absolute URL')
+	if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Absolute URL')
 	{
 		Request.body.Logo = Request.body.Logo_File_Path;
 	}
-	else if (Helpers.Validate_Image_URL (Restaurant.Data.Cart_Icon) === 'Base64 Image')
+	else if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Base64 Image')
 	{
 		Helpers.Save_Base64_Image_to_a_File (Request.body.Logo, Request.body.Logo_File_Path);
 	}
@@ -192,11 +192,11 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 
 Router.put ('/user', async (Request, Response, Next) => 
 {
-	if (Helpers.Validate_Image_URL (Restaurant.Data.Avatar) === 'Absolute URL')
+	if (Helpers.Validate_Image_URL (Request.body.Avatar) === 'Absolute URL')
 	{
 		Request.body.Avatar = Request.body.Avatar_File_Path;
 	}
-	else if (Helpers.Validate_Image_URL (Restaurant.Data.Avatar) === 'Base64 Image')
+	else if (Helpers.Validate_Image_URL (Request.body.Avatar) === 'Base64 Image')
 	{
 		Helpers.Save_Base64_Image_to_a_File (Request.body.Avatar, Request.body.Avatar_File_Path);
 	}
