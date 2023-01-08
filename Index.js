@@ -15,7 +15,7 @@ const Response_Handler = require ('./Middleware/Response_Handler');
 const Router = Express.Router ();
 const Application = Express ();
 Application.use (Express.static (__dirname));
-Application.use (Body_Parser.json ({limit: '50mb'}))
+Application.use (Body_Parser.json ({limit: '150mb'}))
 Application.use (Express.json ());
 
 const { MongoClient, ServerApiVersion } = require ('mongodb');
@@ -127,57 +127,42 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 {
 	Request.body.Categories.forEach (Category => 
 	{
-		if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Absolute URL')
-		{
-			Category.Banner_Image = Category.File_Path;
-		}
-		else if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Base64 Image')
+		if (Helpers.Validate_Image_URL (Category.Banner_Image) === 'Base64 Image')
 		{
 			Helpers.Save_Base64_Image_to_a_File (Category.Banner_Image, Category.File_Path);
 		}
+        Category.Banner_Image = Category.File_Path;
 		delete Category.File_Path;
 	});
-	if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Absolute URL')
-	{
-		Request.body.Cart_Icon = Request.body.Cart_Icon_File_Path;
-	}
-	else if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Base64 Image')
+	if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Base64 Image')
 	{
 		Helpers.Save_Base64_Image_to_a_File (Request.body.Cart_Icon, Request.body.Cart_Icon_File_Path);
 	}
+    Request.body.Cart_Icon = Request.body.Cart_Icon_File_Path;
 	delete Request.body.Cart_Icon_File_Path;
 	Object.keys (Request.body.Icons).forEach (Key =>
 	{
-		if (Helpers.Validate_Image_URL (Request.body.Icons [Key]) === 'Absolute URL')
-		{
-			Request.body.Icons [Key] = Request.body.Icons [`${Key}_File_Path`];
-		}
-		else if (Helpers.Validate_Image_URL (Request.body.Icons [Key]) === 'Base64 Image')
+        if (Helpers.Validate_Image_URL (Request.body.Icons [Key]) === 'Base64 Image')
 		{
 			Helpers.Save_Base64_Image_to_a_File (Request.body.Icons [Key], Request.body.Icons [`${Key}_File_Path`]);
 		}
+        Request.body.Icons [Key] = Request.body.Icons [`${Key}_File_Path`];
 		delete Request.body.Icons [`${Key}_File_Path`];
 	});
 	Request.body.Menu.forEach (Menu_Item => 
 	{
-		if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Absolute URL')
-		{
-			Menu_Item.Image = Menu_Item.File_Path;
-		}
-		else if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Base64 Image')
+		if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Base64 Image')
 		{
 			Helpers.Save_Base64_Image_to_a_File (Menu_Item.Image, Menu_Item.File_Path);
 		}
+        Menu_Item.Image = Menu_Item.File_Path;
 		delete Menu_Item.File_Path;
 	});
-	if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Absolute URL')
-	{
-		Request.body.Logo = Request.body.Logo_File_Path;
-	}
-	else if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Base64 Image')
+	if (Helpers.Validate_Image_URL (Request.body.Cart_Icon) === 'Base64 Image')
 	{
 		Helpers.Save_Base64_Image_to_a_File (Request.body.Logo, Request.body.Logo_File_Path);
 	}
+    Request.body.Logo = Request.body.Logo_File_Path;
 	delete Request.body.Logo_File_Path;
 	Update_Data ('Restaurants', Request.body, {_id: ObjectId (Request.body._id)}).then (Data => 
 	{
@@ -192,14 +177,11 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 
 Router.put ('/user', async (Request, Response, Next) => 
 {
-	if (Helpers.Validate_Image_URL (Request.body.Avatar) === 'Absolute URL')
-	{
-		Request.body.Avatar = Request.body.Avatar_File_Path;
-	}
-	else if (Helpers.Validate_Image_URL (Request.body.Avatar) === 'Base64 Image')
+	if (Helpers.Validate_Image_URL (Request.body.Avatar) === 'Base64 Image')
 	{
 		Helpers.Save_Base64_Image_to_a_File (Request.body.Avatar, Request.body.Avatar_File_Path);
 	}
+    Request.body.Avatar = Request.body.Avatar_File_Path;
 	delete Request.body.Avatar_File_Path;
 	Update_Data ('Users', Request.body, {Username: Request.body.Username}).then (Data => 
 	{
