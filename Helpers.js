@@ -1,4 +1,4 @@
-const Save_Base64_Image_to_a_File = (Base64_Image, Image_File_Path) => require ("fs").writeFile (Image_File_Path, Base64_Image.replace (/^data:image\/png;base64,/, ""), 'base64', (Error_Instance) => console.error (Error_Instance));
+const Save_Base64_Image_to_a_File = async (Base64_Image, Image_File_Path) => await require ("fs").writeFile (`${__dirname}/${Image_File_Path}`, Base64_Image.replace (/^data:image\/png;base64,/, ""), {encoding: 'base64'}, Error_Instance => console.error (Error_Instance));
 
 const Turn_Absolute_URL_to_Abstract_URL = Uniform_Resource_Locator =>
 {
@@ -32,6 +32,9 @@ const Validate_Image_URL = Image_URL =>
 	}
 }
 
-module.exports = Save_Base64_Image_to_a_File;
-module.exports = Turn_Absolute_URL_to_Abstract_URL;
-module.exports = Validate_Image_URL;
+module.exports = 
+{
+    Save_Base64_Image_to_a_File,
+    Turn_Absolute_URL_to_Abstract_URL,
+    Validate_Image_URL,
+}
