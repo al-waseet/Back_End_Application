@@ -14,6 +14,8 @@ const Response_Handler = require ('./Middleware/Response_Handler');
 
 const Router = Express.Router ();
 const Application = Express ();
+const Web_Socket = require ('express-ws') (Application);
+
 Application.use (Express.static (__dirname));
 Application.use (Body_Parser.json ({limit: '150mb'}))
 Application.use (Express.json ());
@@ -368,5 +370,14 @@ Router.post ('/email', async (Request, Response, Next) =>
 }, Response_Handler);
 
 // Password: a
+
+Router.ws ('/preview', (ws, req) =>
+{
+    ws.on ('message', function (msg) 
+    {
+        ws.send(msg);
+    });
+});
+  
 
 Application.listen (process.env.Server_Port_Number);
