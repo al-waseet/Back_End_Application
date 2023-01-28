@@ -1,6 +1,17 @@
-const Get_the_File_Extension = Image_File_Path => Image_File_Path.includes ('.png') ? 'png' : (Image_File_Path.includes ('.jpeg') ? 'jpeg' : (Image_File_Path.includes ('.svg') ? 'svg' : ''))
+const Get_the_File_Extension = Image_File_Path => 
+{
+    let Result = '';
+    ['png', 'jpeg', 'jpg', 'svg'].forEach (File_Extension => 
+    {
+        if (Image_File_Path.includes (File_Extension))
+        {
+            Result = Result + File_Extension;
+        }
+    });
+    return Result;
+}
 
-const Save_Base64_Image_to_a_File = async (Base64_Image, Image_File_Path) => await require ("fs").writeFile (`${process.env.Environment === "Production" ? require ('path').join (__dirname, '..', 'public_html') : __dirname}${Image_File_Path}`, Base64_Image.replace (`/^data:image\/${Get_the_File_Extension (Image_File_Path)};base64,/`, ""), {encoding: 'base64'}, Error_Instance => console.error (Error_Instance));
+const Save_Base64_Image_to_a_File = async (Base64_Image, Image_File_Path) => await require ("fs").writeFile (`${process.env.Environment === "Production" ? require ('path').join (__dirname, '..', 'public_html') : __dirname}${Image_File_Path}`, Base64_Image.replace (`data:image/${Get_the_File_Extension (Image_File_Path)};base64,`, ""), {encoding: 'base64'}, Error_Instance => console.error (Error_Instance));
 
 const Turn_Absolute_URL_to_Abstract_URL = Uniform_Resource_Locator =>
 {
