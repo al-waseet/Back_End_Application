@@ -14,7 +14,6 @@ const Response_Handler = require ('./Middleware/Response_Handler');
 
 const Router = Express.Router ();
 const Application = Express ();
-const Web_Socket = require ('express-ws') (Application);
 
 Application.use (Express.static (__dirname));
 Application.use (Body_Parser.json ({limit: '150mb'}))
@@ -373,13 +372,21 @@ Router.post ('/email', async (Request, Response, Next) =>
 
 // Password: a
 
-Router.ws ('/preview', (ws, req) =>
+const WebSocket = require('ws');
+
+const server = new WebSocket.Server({port: 3031});
+
+server.on('connection', ws => 
 {
-	ws.on ('message', function (msg) 
-	{
-		ws.send(msg);
-	});
+
+    ws.on('message', (message) => {
+		console.log (message);
+		server.broadcast (message);
+    });
+
+    ws.on('close', (code, reason) => {
+        console.log(`Connection closed: ${code} ${reason}!`);
+    });
 });
-  
 
 Application.listen (process.env.Server_Port_Number);
