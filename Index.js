@@ -8,6 +8,7 @@ const Express = require ('express');
 const JSON_Web_Token = require ('jsonwebtoken');
 const nodemailer = require ("nodemailer");
 const ObjectId = require ('mongodb').ObjectId;
+const WebSocket = require('ws');
 
 const Helpers = require ('./Helpers');
 const Response_Handler = require ('./Middleware/Response_Handler');
@@ -154,7 +155,7 @@ Router.put ('/restaurant', async (Request, Response, Next) =>
 	{
 		if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Base64 Image')
 		{
-            console.log (Menu_Item.File_Path);
+			console.log (Menu_Item.File_Path);
 			Helpers.Save_Base64_Image_to_a_File (Menu_Item.Image, Menu_Item.File_Path);
 		}
 		Menu_Item.Image = Menu_Item.File_Path;
@@ -372,21 +373,22 @@ Router.post ('/email', async (Request, Response, Next) =>
 
 // Password: a
 
-const WebSocket = require('ws');
+const Web_Socket_Server = new WebSocket.Server ({port: 3031});
 
-const server = new WebSocket.Server({port: 3031});
-
-server.on('connection', ws => 
+Web_Socket_Server.on ('connection', (Web_Socket, Request) => 
 {
+	Web_Socket.URL = Request.headers.origin;
 
-    ws.on('message', (message) => {
-		console.log (message);
-		server.broadcast (message);
-    });
-
-    ws.on('close', (code, reason) => {
-        console.log(`Connection closed: ${code} ${reason}!`);
-    });
+	Web_Socket.on ('message', Message => 
+	{
+		setTimeout (() => Web_Socket_Server.clients.forEach (Client => 
+		{
+			if (Client.URL === process.env.Ordering_Application_Root_URL || Client.URL === process.env.Production_Root_URL)
+			{
+				Client.send (Message);
+			}
+		}), 5000);
+	});
 });
 
 Application.listen (process.env.Server_Port_Number);
