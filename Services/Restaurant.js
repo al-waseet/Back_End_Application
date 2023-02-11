@@ -1,4 +1,5 @@
 const {Get_Data, Insert_Data, Update_Data} = require ('../Database/Functions');
+const Helpers = require ('../Helpers');
 const ObjectId = require ('mongodb').ObjectId;
 
 const Get_POS = async (Request, Response, Next) => 
@@ -57,20 +58,31 @@ const Update_the_Restaurant = async (Request, Response, Next) =>
 	}
 	Request.body.Cart_Icon = Request.body.Cart_Icon_File_Path;
 	delete Request.body.Cart_Icon_File_Path;
-	Object.keys (Request.body.Icons).forEach (Key =>
+	if (Helpers.Validate_Image_URL (Request.body.Icons.Five_Hundred_Twelve_Pixels) === 'Base64 Image')
 	{
-		if (Helpers.Validate_Image_URL (Request.body.Icons [Key]) === 'Base64 Image')
-		{
-			Helpers.Save_Base64_Image_to_a_File (Request.body.Icons [Key], Request.body.Icons [`${Key}_File_Path`]);
-		}
-		Request.body.Icons [Key] = Request.body.Icons [`${Key}_File_Path`];
-		delete Request.body.Icons [`${Key}_File_Path`];
-	});
+		Helpers.Save_Base64_Image_to_a_File (Request.body.Icons.Five_Hundred_Twelve_Pixels, Request.body.Icons.Five_Hundred_Twelve_Pixels_File_Path);
+	}
+	Request.body.Icons.Five_Hundred_Twelve_Pixels = Request.body.Icons.Five_Hundred_Twelve_Pixels_File_Path;
+	delete Request.body.Icons.Five_Hundred_Twelve_Pixels_File_Path;
+
+	/*if (Helpers.Validate_Image_URL (Request.body.Icons.One_Hundred_Ninety_Two_Pixels) === 'Base64 Image')
+	{
+		Helpers.Save_Base64_Image_to_a_File (Request.body.Icons.One_Hundred_Ninety_Two_Pixels, Request.body.Icons.One_Hundred_Ninety_Two_Pixels_File_Path);
+	}
+	Request.body.Icons.One_Hundred_Ninety_Two_Pixels = Request.body.Icons.One_Hundred_Ninety_Two_Pixels_File_Path;
+	delete Request.body.Icons.One_Hundred_Ninety_Two_Pixels_File_Path;
+
+	if (Helpers.Validate_Image_URL (Request.body.Icons.Favicon) === 'Base64 Image')
+	{
+		Helpers.Save_Base64_Image_to_a_File (Request.body.Icons.Favicon, Request.body.Icons.Favicon_File_Path);
+	}
+	Request.body.Icons.Favicon = Request.body.Icons.Favicon_File_Path;
+	delete Request.body.Icons.Favicon_File_Path;*/
+
 	Request.body.Menu.forEach (Menu_Item => 
 	{
 		if (Helpers.Validate_Image_URL (Menu_Item.Image) === 'Base64 Image')
 		{
-			console.log (Menu_Item.File_Path);
 			Helpers.Save_Base64_Image_to_a_File (Menu_Item.Image, Menu_Item.File_Path);
 		}
 		Menu_Item.Image = Menu_Item.File_Path;

@@ -1,3 +1,4 @@
+const {Get_Data, Update_Data} = require ('../Database/Functions');
 const Helpers = require ('../Helpers');
 
 const Get_Users = async (Request, Response, Next) => 
